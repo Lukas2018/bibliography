@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <a id="logout" href="/logout"> Wyloguj się </a>
+        <div class="files">
+            <h2>Witaj {{ username }} w swoim systemie zarządzania bibliografią</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for category, message in messages %}
+                            <li class="alert-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% for file in files %}
+            <div>
+                <div id="download">
+                    <form action="/download" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="user" value="{{user}}" />
+                        <input type="hidden" name="file" value="{{file}}" />
+                        {{file}}
+                        <input type="submit" value="download"/>
+                    </form>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            {% endfor %}
+            <div>
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    Dodaj plik:
+                    <ul>
+                    <li class="col-md-12 form-group">
+                        <input type="file" name="file" accept="application/pdf"/>
+                    </li>
+                    <input type="hidden" name="user" value="{{user}}" />
+                    <li class="col-md-12 form-group">
+                        <input type="submit" value="Prześlij"/>
+                    </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
