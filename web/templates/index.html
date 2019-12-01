@@ -14,29 +14,30 @@
                 {% endif %}
             {% endwith %}
             {% for file in files %}
-            <div>
-                <div id="download">
-                    <form action="/download" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="user" value="{{user}}" />
-                        <input type="hidden" name="file" value="{{file}}" />
-                        {{file}}
-                        <input type="submit" value="download"/>
-                    </form>
-                </div>
-                <div style="clear:both;"></div>
+            <div class="operations">
+                <form class="download" action="/download" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="file" value="{{file}}" />
+                    <p>{{file}}</p>
+                    <p><input type="submit" value="download"/></p>
+                </form>
+                <form class="delete" action="/delete" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="file" value="{{file}}" />
+                    <p><input type="submit" value="delete"/></p>
+                </form>
+				<div style="clear:both;"></div>
             </div>
             {% endfor %}
-            <div>
+            <div class="upload">
                 <form action="/upload" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    Dodaj plik:
+                    <p>Dodaj plik:</p>
                     <ul>
                     <li class="col-md-12 form-group">
-                        <input type="file" name="file" accept="application/pdf"/>
+                        <input type="file" name="file" accept="application/pdf" required/>
                     </li>
-                    <input type="hidden" name="user" value="{{user}}" />
-                    <li class="col-md-12 form-group">
+                    <li class="col-md-12 form-group przeslij">
                         <input type="submit" value="Prześlij"/>
                     </li>
                     </ul>

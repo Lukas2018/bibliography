@@ -83,7 +83,7 @@ def download():
     params = {
         'token': download_token
     }
-    resp = requests.get('http://cdn:5000/' + username + '/' + file, params=params)
+    resp = requests.get('http://cdn:5000/' + username + '/' + file + '/download', params=params)
     response = Response(response=resp.content, content_type='application/pdf')
     return response
 
@@ -103,7 +103,7 @@ def upload():
         'username': username,
         'token': upload_token
     }
-    resp = requests.post('http://cdn:5000/upload', files=files, params=params)
+    resp = requests.post('http://cdn:5000/' + username + '/upload', files=files, params=params)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
@@ -123,12 +123,12 @@ def delete():
     params = {
         'token': delete_token
     }
-    resp = requests.delete('http://cdn:5000/delete' + username + '/' + file, params=params)
+    resp = requests.delete('http://cdn:5000/' + username + '/' + file + '/delete', params=params)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
         flash(resp.content.decode(), 'warning')
-    response = make_response('/index')
+    response = make_response(redirect('/index'))
     return response
 
 

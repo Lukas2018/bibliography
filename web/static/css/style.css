@@ -40,7 +40,7 @@ body {
 	padding-left: 5px;
 }
 
-.form label b, #login_form p, .files li {
+.form label b, #login_form p, .files li, .files p {
 	padding-left: 15px;
 }
 
@@ -50,14 +50,30 @@ body {
 	padding-top: 5px;
 }
 
-#delete, #download {
-	float: left;
-}
-
 #logout {
-	text-align: right;
+	position: absolute;
+    right: 5%;
+    top: 2%;
+	border: 2px solid black;
+	border-radius: 15px;
+	margin: auto;
+	background-color: rgb(242, 242, 242);
+	padding: 5px
 }
 
+.operations {
+	border: 2px solid black;
+	border-radius: 15px;
+	margin: 10px 5px;
+	padding: 5px;
+}
+.download {
+	width: 100%;
+}
 .content h2 {
 	text-align: center;
+}
+
+.przeslij {
+	margin-top: 8px;
 }
