@@ -80,15 +80,13 @@ def create_bibliography():
         response = make_response(redirect('/index'))
         username = session.get_username_by_session(session_id)
         token = tokens.create_bibliography_add_token(username)
-        params = {
-            'token': token
-        }
         data = {
             'name': form.name.data,
             'author': form.author.data,
-            'date': str(form.date.data)
+            'date': str(form.date.data),
+            'token': token
         }
-        resp = requests.post('http://cdn:5000/' + username + '/bibliography', json=data, params=params)
+        resp = requests.post('http://cdn:5000/' + username + '/bibliography', json=data)
         if resp.status_code == 200:
             flash(resp.content.decode(), 'success')
         else:
@@ -123,15 +121,13 @@ def edit_bibliography():
     if form.validate_on_submit():
         username = session.get_username_by_session(session_id)
         token = tokens.create_bibliography_edit_token(username)
-        params = {
-            'token': token
-        }
         data = {
             'name': form.name.data,
             'author': form.author.data,
-            'date': str(form.date.data)
+            'date': str(form.date.data),
+            'token': token
         }
-        resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), json=data, params=params)
+        resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), json=data)
         if resp.status_code == 200:
             flash(resp.content.decode(), 'success')
         else:
@@ -149,10 +145,10 @@ def delete_bibliography():
     response = make_response(redirect('/index'))
     username = session.get_username_by_session(session_id)
     token = tokens.create_bibliography_delete_token(username)
-    params = {
+    data = {
         'token': token
     }
-    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), params=params)
+    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), json=data)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
@@ -183,17 +179,16 @@ def upload_file():
         return redirect('/login')
     username = session.get_username_by_session(session_id)
     file = request.files.get('file')
-    upload_token = tokens.create_upload_token(username)
+    token = tokens.create_upload_token(username)
     files = {
         'file': (file.filename, file)
     }
-    params = {
-        'username': username,
-        'token': upload_token
+    data = {
+        'token': token
     }
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
-    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', files=files, params=params)
+    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', files=files, json=data)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
@@ -209,13 +204,13 @@ def download_file():
     if session_id is None:
         return redirect('/login')
     username = session.get_username_by_session(session_id)
-    download_token = tokens.create_download_token(username)
+    token = tokens.create_download_token(username)
     file = request.form.get('file')
     file = json.loads(file.replace("\'", "\""))
-    params = {
-        'token': download_token
+    data = {
+        'token': token
     }
-    resp = requests.get('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/download', params=params)
+    resp = requests.get('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/download', json=data)
     response = Response(response=resp.content, content_type='application/pdf')
     return response
 
@@ -226,13 +221,13 @@ def delete_file():
     if session_id is None:
         return redirect('/login')
     username = session.get_username_by_session(session_id)
-    delete_token = tokens.create_delete_file_token(username)
+    token = tokens.create_delete_file_token(username)
     file = request.form.get('file')
     file = json.loads(file.replace("\'", "\""))
-    params = {
-        'token': delete_token
+    data = {
+        'token': token
     }
-    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/delete', params=params)
+    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/delete', json=data)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:

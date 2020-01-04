@@ -31,7 +31,8 @@ def list_user_bibliographies(username):
 
 @app.route('/<username>/bibliography', methods=['POST'])
 def create_bibliography(username):
-    token = request.args.get('token')
+    res = request.json
+    token = res['token']
     if token is None:
         return make_response('Brak tokenu', 401)
     if not valid(token):
@@ -39,7 +40,6 @@ def create_bibliography(username):
     payload = decode(token, JWT_SECRET)
     if payload.get('user') != username or not payload.get('bibliography') or not payload.get('create'):
         return make_response('Nieprawidłowa zawartość tokenu', 401)
-    res = request.json
     bibliography = Bibliography()
     bibliography.name = res['name']
     bibliography.author = res['author']
@@ -52,7 +52,8 @@ def create_bibliography(username):
 
 @app.route('/<username>/bibliography/<id>', methods=['POST'])
 def edit_bibliography(username, id):
-    token = request.args.get('token')
+    res = request.json
+    token = res['token']
     if token is None:
         return make_response('Brak tokenu', 401)
     if not valid(token):
@@ -60,7 +61,6 @@ def edit_bibliography(username, id):
     payload = decode(token, JWT_SECRET)
     if payload.get('user') != username or not payload.get('bibliography') or not payload.get('edit'):
         return make_response('Nieprawidłowa zawartość tokenu', 401)
-    res = request.json
     bibliography = Bibliography()
     bibliography.name = res['name']
     bibliography.author = res['author']
@@ -73,14 +73,14 @@ def edit_bibliography(username, id):
 
 @app.route('/<username>/bibliography/<id>', methods=['DELETE'])
 def delete_bibliography(username, id):
-    token = request.args.get('token')
+    token = request.json['token']
     if token is None:
         return make_response('Brak tokenu', 401)
     if not valid(token):
         return make_response('Nieważny token', 401)
     payload = decode(token, JWT_SECRET)
     if payload.get('user') != username or not payload.get('bibliography') or not payload.get('delete'):
-        return make_response('Nieprawidłowa zawartość tokenu', 401)
+        return make_response('Nieprawidłowa zawartość tokenu', 404)
     bibliography_storage.delete_bibliography(int(id))
     return make_response('Poprawnie usunięto bibliografie', 200)
 
@@ -96,7 +96,7 @@ def list_bibliography_files(username, id):
 @app.route('/<username>/bibliography/<id>/file/upload', methods=['POST'])
 def upload(username, id):
     file = request.files['file']
-    token = request.args.get('token')
+    token = request.json['token']
     if file is None:
         return make_response('Nie podano pliku', 401)
     if token is None:
@@ -113,7 +113,7 @@ def upload(username, id):
 
 @app.route('/<username>/bibliography/file/<id>/download')
 def download(username, id):
-    token = request.args.get('token')
+    token = request.json['token']
     if token is None:
         return make_response('Brak tokenu', 401)
     if not valid(token):
@@ -127,7 +127,7 @@ def download(username, id):
 
 @app.route('/<username>/bibliography/file/<id>/delete', methods=['DELETE'])
 def delete(username, id):
-    token = request.args.get('token')
+    token = request.json['token']
     if token is None:
         return make_response('Brak tokenu', 401)
     if not valid(token):
