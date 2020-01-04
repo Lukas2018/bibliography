@@ -1,0 +1,64 @@
+body {
+	width: 100%;
+	background-image: url("../media/vintage-leaves.png");
+}
+#register {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+#register_form {
+	max-width: 600px;
+	border: 2px solid black;
+	border-radius: 20px;
+	margin: auto;
+	background-color: rgb(242, 242, 242);
+	padding-top: 20px;
+	position: absolute;
+	top: 5%;
+	left: 0;
+	right: 0;
+	box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+#register_form h1 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+#register_form input {
+	padding-left: 5px;
+}
+
+#register_form ul {
+	list-style: none;
+	padding: 0;
+}
+
+#register_form label {
+	padding-left: 5px;
+}
+
+#register_form label b {
+	padding-left: 15px;
+}
+
+#register_form button {
+	
+}
+
+.invalid_data {
+	color: red;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+
+.invalid_data_file {
+	text-align: center;
+	color: red;
+}	
+#file{
+	margin-left: auto;
+	margin-right: auto;
+}

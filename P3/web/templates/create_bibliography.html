@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <a id="logout" href="/logout"> Wyloguj się </a>
+        <form id="register_form" class="form" action="/create_bibliography" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<h1>Utwórz nową bibliografię:</h1>
+			<ul >
+				<li class="col-md-12 form-group">
+					<label for="name">Nazwa</label>
+					<input id="name" class="form-control" type="text" name="name" placeholder="Nazwa" required>
+                    {% for error in form.name.errors %}
+                    <p class="invalid_data">[{{ error }}]</p>
+                    {% endfor %}
+				</li>
+				<li class="col-md-12 form-group">
+					<label for="author">Autor</label>
+					<input id="author" class="form-control" type="text" name="author" placeholder="Autor" required>
+                    {% for error in form.author.errors %}
+                    <p class="invalid_data">[{{ error }}]</p>
+                    {% endfor %}
+				</li>
+				<li class="col-md-12 form-group">
+					<label for="date">Date</label>
+					<input id="date" class="form-control" type="date" name="date" placeholder="Data" required>
+				    {% for error in form.date.errors %}
+                    <p class="invalid_data">[{{ error }}]</p>
+                    {% endfor %}
+                </li>
+				<li>
+					<button class="btn btn-primary btn-block active" type="sumbit">Prześlij formularz</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-block active">Wróć</a>
+				</li>
+			</ul>
+		</form>
+    </div>
+{% endblock %}

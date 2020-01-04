@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <a id="logout" href="/logout"> Wyloguj się </a>
+        <div class="bibliographies">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for category, message in messages %}
+                            <li class="alert-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% if bibliographies %}
+                {% for bibliography in bibliographies %}
+                <div class="operations">
+                    <ul>
+                        <div class="row justify-content-start">
+                            <li class="col-md-12 form-group">
+                                <form action="/bibliography_details" id="details" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="bibliography" value="{{bibliography}}" />
+                                    <h3><p><a href="#" onclick="document.getElementById('details').submit();">{{ bibliography['name'] }}</a></p></h3>
+                                </form>
+                            </li>
+                        </div>
+                        <div class="row justify-content-end">
+                            <li class="col-md-12 form-group">
+                                <p>Opublikowane przez: {{ bibliography['owner'] }}, {{ bibliography['publication_date'] }}</p>
+                            </li>
+                        </div>
+                        <div class="row">
+                            <li class="col-md-4 form-group">
+                                <form action="/bibliography_details" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="bibliography" value="{{ bibliography }}" />
+                                    <p><input class="btn btn-info" type="submit" value="Szczegóły"/></p>
+                                </form>
+                            </li>
+                            <li class="col-md-4 form-group">
+                                <form action="/edit_bibliography" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="bibliography" value="{{ bibliography }}" />
+                                    <p><input class="btn btn-warning" type="submit" value="Edytuj"/></p>
+                                </form>
+                            </li>
+                            <li class="col-md-4 form-group">
+                                <form action="/delete_bibliography" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="bibliography" value="{{bibliography}}" />
+                                    <p><input class="btn btn-danger" type="submit" value="Usuń"/></p>
+                                </form>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Twoja bibliografia jest pusta.</p>
+            {% endif %}
+            <div class="operations create">
+                <form action="/create_bibliography" method="GET" enctype="multipart/form-data">
+                    <input class="btn btn-primary" type="submit" value="Dodaj bibliografie" name="Submit" />
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
