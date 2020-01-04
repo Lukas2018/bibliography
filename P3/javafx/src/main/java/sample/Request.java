@@ -1,11 +1,15 @@
 package sample;
 
 import org.json.JSONObject;
+import org.omg.CORBA.NameValuePair;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Request {
     private HttpURLConnection connection = null;
@@ -29,6 +33,7 @@ public class Request {
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(json.toString());
             wr.flush();
+            wr.close();
         }
         StringBuilder sb = new StringBuilder();
         int HttpResult = connection.getResponseCode();
@@ -52,26 +57,30 @@ public class Request {
         return sendRequest(target, "GET", null);
     }
 
-    public String createBibliography(String bibliographyName, String bibliographyAuthor, Date bibliographyDate) throws IOException {
+    public String createBibliography(String bibliographyName, String bibliographyAuthor, Date bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography";
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
         json.put("date", bibliographyDate.toString());
+        json.put("token", token);
         return sendRequest(target, "POST", json);
     }
 
-    public String editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, Date bibliographyDate) throws IOException {
+    public String editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, Date bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId;
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
         json.put("date", bibliographyDate.toString());
+        json.put("token", token);
         return sendRequest(target, "POST", json);
     }
 
-    public String deleteBibliography(String bibliographyId) throws IOException {
+    public String deleteBibliography(String bibliographyId, String token) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId;
-        return sendRequest(target, "DELETE", null);
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        return sendRequest(target, "DELETE", json);
     }
 }

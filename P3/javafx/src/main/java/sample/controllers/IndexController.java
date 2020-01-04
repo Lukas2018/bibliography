@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import sample.Bibliography;
 import sample.BibliographyCellFactory;
 import sample.Request;
+import sample.Token;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -21,6 +22,7 @@ import java.util.Date;
 
 public class IndexController {
     private Request request;
+    private Token token;
     private Bibliography selectedBibliography = null;
     @FXML
     private ListView listView;
@@ -50,6 +52,7 @@ public class IndexController {
     private DatePicker dateEdit;
     public IndexController() {
         request = new Request();
+        token = new Token();
     }
 
     @FXML
@@ -68,8 +71,8 @@ public class IndexController {
             Bibliography clickedBibliography = (Bibliography) listView.getSelectionModel().getSelectedItem();
             if(clickedBibliography != selectedBibliography) {
                 selectedBibliography = clickedBibliography;
-                showBibliographyDetails();
             }
+            showBibliographyDetails();
         });
     }
 
@@ -77,6 +80,7 @@ public class IndexController {
     public void showApp() {
         if(login.getText() != null && !login.getText().trim().isEmpty()) {
             request.setUsername(login.getText().trim());
+            token.setUsername(login.getText().trim());
             vBoxLogin.setVisible(false);
             vBoxLogin.setManaged(false);
             listView.getItems().addAll(createBibliographyList());
@@ -106,11 +110,13 @@ public class IndexController {
     public void submitCreate() {
         String name = nameCreate.getText();
         String author = authorCreate.getText();
-        Date date = null;
-        if(name != null && author != null && date != null && !name.trim().isEmpty() && !author.isEmpty()) {
+        LocalDate localDate = dateCreate.getValue();
+        if(name != null && author != null && localDate != null && !name.trim().isEmpty() && !author.isEmpty()) {
             try {
-                request.createBibliography(name.trim(), author.trim(), date);
+                Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                request.createBibliography(name.trim(), author.trim(), date, "");
                 synchronize();
+                vBoxCreate.setVisible(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -137,10 +143,10 @@ public class IndexController {
         int id = selectedBibliography.getId();
         String name = nameEdit.getText();
         String author = authorEdit.getText();
-        Date date = null;
+        Date date = Date.from(dateEdit.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         if(name != null && author != null && date != null && !name.trim().isEmpty() && !author.isEmpty()) {
             try {
-                request.editBibliography(id, name.trim(), author.trim(), date);
+                request.editBibliography(id, name.trim(), author.trim(), date, "");
                 synchronize();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -152,7 +158,8 @@ public class IndexController {
     public void deleteBibliography() {
         if(selectedBibliography != null) {
             try {
-                request.deleteBibliography(String.valueOf(selectedBibliography.getId()));
+                String deleteToken = token.createBibliographyDeleteToken();
+                request.deleteBibliography(String.valueOf(selectedBibliography.getId()), deleteToken);
             } catch (IOException e) {
                 e.printStackTrace();
             }
