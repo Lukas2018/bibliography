@@ -1,6 +1,0 @@
-flask
-flask_wtf
-pyjwt
-redis
-requests
-python-dotenv

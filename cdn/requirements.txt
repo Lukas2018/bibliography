@@ -1,4 +1,0 @@
-flask
-pyjwt
-requests
-python-dotenv
