@@ -96,7 +96,7 @@ def list_bibliography_files(username, id):
 @app.route('/<username>/bibliography/<id>/file/upload', methods=['POST'])
 def upload(username, id):
     file = request.files['file']
-    token = request.json['token']
+    token = request.args.get('token')
     if file is None:
         return make_response('Nie podano pliku', 401)
     if token is None:

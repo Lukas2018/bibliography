@@ -29,14 +29,57 @@ public class Token {
         return "";
     }
 
+    public String createBibliographyCreateToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "desktop");
+        claims.put("user", username);
+        claims.put("bibliography", true);
+        claims.put("create", true);
+        return createJWT(claims);
+    }
+
+    public String createBibliographyEditToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "desktop");
+        claims.put("user", username);
+        claims.put("bibliography", true);
+        claims.put("edit", true);
+        return createJWT(claims);
+    }
+
     public String createBibliographyDeleteToken() {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("iss", "web");
+        claims.put("iss", "desktop");
         claims.put("user", username);
         claims.put("bibliography", true);
         claims.put("delete", true);
-        System.out.println(createJWT(claims));
         return createJWT(claims);
+    }
 
+    public String createFileUploadToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "desktop");
+        claims.put("user", username);
+        claims.put("file", true);
+        claims.put("upload", true);
+        return createJWT(claims);
+    }
+
+    public String createFileDownloadToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "desktop");
+        claims.put("user", username);
+        claims.put("file", true);
+        claims.put("download", true);
+        return createJWT(claims);
+    }
+
+    public String createFileDeleteToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "desktop");
+        claims.put("user", username);
+        claims.put("file", true);
+        claims.put("delete", true);
+        return createJWT(claims);
     }
 }

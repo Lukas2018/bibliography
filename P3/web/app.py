@@ -183,12 +183,12 @@ def upload_file():
     files = {
         'file': (file.filename, file)
     }
-    data = {
+    params = {
         'token': token
     }
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
-    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', files=files, json=data)
+    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', params=params, files=files)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.IndexController">
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.IndexController">
     <children>
         <HBox prefHeight="478.0" prefWidth="504.0">
             <children>
@@ -61,7 +61,18 @@
                 </VBox>
                 <VBox fx:id="vBoxDetails" alignment="CENTER" prefHeight="478.0" prefWidth="394.0">
                     <children>
-                        <Label prefHeight="18.0" text="Nazwa"/>
+                        <Label fx:id="nameDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="authorDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="dateDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="ownerDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="publicationDateDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label prefWidth="250" maxWidth="250" text="Lista plików:"/>
+                        <ListView fx:id="fileListView" prefHeight="200.0" prefWidth="0.0"/>
+                        <HBox alignment="CENTER" spacing="50">
+                            <Button text="Synchronizuj pliki" onAction="#synchronizeFile"></Button>
+                            <Button text="Pobierz plik" onAction="#downloadFile"></Button>
+                            <Button text="Usuń plik" onAction="#deleteFile"></Button>
+                        </HBox>
                     </children>
                 </VBox>
             </children>

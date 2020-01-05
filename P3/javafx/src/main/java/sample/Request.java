@@ -57,22 +57,22 @@ public class Request {
         return sendRequest(target, "GET", null);
     }
 
-    public String createBibliography(String bibliographyName, String bibliographyAuthor, Date bibliographyDate, String token) throws IOException {
+    public String createBibliography(String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography";
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
-        json.put("date", bibliographyDate.toString());
+        json.put("date", bibliographyDate);
         json.put("token", token);
         return sendRequest(target, "POST", json);
     }
 
-    public String editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, Date bibliographyDate, String token) throws IOException {
+    public String editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId;
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
-        json.put("date", bibliographyDate.toString());
+        json.put("date", bibliographyDate);
         json.put("token", token);
         return sendRequest(target, "POST", json);
     }
@@ -82,5 +82,10 @@ public class Request {
         JSONObject json = new JSONObject();
         json.put("token", token);
         return sendRequest(target, "DELETE", json);
+    }
+
+    public String getListOfFiles(int bibliographyId) throws IOException {
+        String target = targetURL + username + "/bibliography/" + bibliographyId + "/details";
+        return sendRequest(target, "GET", null);
     }
 }

@@ -17,6 +17,7 @@ public class Bibliography {
         this.author = author;
         this.date = date;
         this.owner = owner;
+
         this.publication_date = publication_date;
     }
 
@@ -34,5 +35,13 @@ public class Bibliography {
 
     public Date getDate() {
         return date;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public Date getPublication_date() {
+        return publication_date;
     }
 }
