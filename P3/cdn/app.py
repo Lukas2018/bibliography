@@ -2,12 +2,13 @@ import json
 from datetime import datetime
 from io import BytesIO
 
-from config import Config
+from flask import Flask, send_file
+from flask import make_response
+from flask import request
 from flask_sqlalchemy import SQLAlchemy
 from jwt import decode, InvalidTokenError
-from flask import Flask, send_file
-from flask import request
-from flask import make_response
+
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -15,6 +16,7 @@ db = SQLAlchemy(app)
 
 import bibliography_storage
 from models import File, Bibliography
+
 db.drop_all()
 db.create_all()
 
@@ -45,7 +47,8 @@ def create_bibliography(username):
     bibliography.author = res['author']
     bibliography.date = datetime.strptime(res['date'], '%Y-%m-%d')
     bibliography.owner = username
-    bibliography.publication_date = datetime.strptime(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+    bibliography.publication_date = datetime.strptime(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                                                      '%Y-%m-%d %H:%M:%S')
     bibliography_storage.add_bibliography(bibliography)
     return make_response('Poprawnie dodano bibliografie', 200)
 
@@ -66,7 +69,8 @@ def edit_bibliography(username, id):
     bibliography.author = res['author']
     bibliography.date = datetime.strptime(res['date'], '%Y-%m-%d')
     bibliography.owner = username
-    bibliography.publication_date = datetime.strptime(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+    bibliography.publication_date = datetime.strptime(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                                                      '%Y-%m-%d %H:%M:%S')
     bibliography_storage.edit_bibliography(int(id), bibliography)
     return make_response('Poprawnie edytowano bibliografie', 200)
 
@@ -96,16 +100,8 @@ def list_bibliography_files(username, id):
 @app.route('/<username>/bibliography/<id>/file/upload', methods=['POST'])
 def upload(username, id):
     file = request.files['file']
-    token = request.args.get('token')
     if file is None:
         return make_response('Nie podano pliku', 401)
-    if token is None:
-        return make_response('Brak tokenu', 401)
-    if not valid(token):
-        return make_response('Nieważny token', 401)
-    payload = decode(token, JWT_SECRET)
-    if payload.get('user') != username or not payload.get('file') or not payload.get('upload'):
-        return make_response('Nieprawidłowa zawartość tokenu', 401)
     new_file = File(filename=file.filename, data=file.read(), bibliography_id=int(id))
     bibliography_storage.upload_file(new_file)
     return make_response('Pomyślnie dodano plik', 200)

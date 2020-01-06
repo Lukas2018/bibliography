@@ -179,16 +179,12 @@ def upload_file():
         return redirect('/login')
     username = session.get_username_by_session(session_id)
     file = request.files.get('file')
-    token = tokens.create_upload_token(username)
     files = {
         'file': (file.filename, file)
     }
-    params = {
-        'token': token
-    }
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
-    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', params=params, files=files)
+    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload', files=files)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:

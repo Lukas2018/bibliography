@@ -18,10 +18,10 @@
                     <ul>
                         <div class="row justify-content-start">
                             <li class="col-md-12 form-group">
-                                <form action="/bibliography_details" id="details" method="POST">
+                                <form action="/bibliography_details" id="details{{ loop.index }}" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="bibliography" value="{{bibliography}}" />
-                                    <h3><p><a href="#" onclick="document.getElementById('details').submit();">{{ bibliography['name'] }}</a></p></h3>
+                                    <h3><p><a href="#" onclick="document.getElementById('details{{ loop.index }}').submit();">{{ bibliography['name'] }}</a></p></h3>
                                 </form>
                             </li>
                         </div>
