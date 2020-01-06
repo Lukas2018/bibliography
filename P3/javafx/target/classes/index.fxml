@@ -68,11 +68,12 @@
                         <Label fx:id="publicationDateDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
                         <Label prefWidth="250" maxWidth="250" text="Lista plików:"/>
                         <ListView fx:id="fileListView" prefHeight="200.0" prefWidth="0.0"/>
-                        <HBox alignment="CENTER" spacing="50">
-                            <Button text="Synchronizuj pliki" onAction="#synchronizeFiles"></Button>
+                        <HBox fx:id="hBoxFiles" alignment="CENTER" spacing="50">
+                            <Button text="Dodaj plik" alignment="CENTER" onAction="#uploadFIle"></Button>
                             <Button text="Pobierz plik" onAction="#downloadFile"></Button>
                             <Button text="Usuń plik" onAction="#deleteFile"></Button>
                         </HBox>
+                        <Button text="Synchronizuj pliki" onAction="#synchronizeFiles"></Button>
                     </children>
                 </VBox>
             </children>

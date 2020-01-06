@@ -7,12 +7,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-import org.apache.commons.io.FileUtils;
+import javafx.stage.FileChooser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -83,14 +84,14 @@ public class IndexController {
         vBoxLogin.setManaged(true);
         listView.setOnMouseClicked(event -> {
             Bibliography clickedBibliography = (Bibliography) listView.getSelectionModel().getSelectedItem();
-            if(clickedBibliography != selectedBibliography) {
+            if (clickedBibliography != selectedBibliography) {
                 selectedBibliography = clickedBibliography;
             }
             showBibliographyDetails();
         });
         fileListView.setOnMouseClicked(event -> {
             BibliographyFile clickedBibliographyFile = (BibliographyFile) fileListView.getSelectionModel().getSelectedItem();
-            if(clickedBibliographyFile != selectedBibliographyFile) {
+            if (clickedBibliographyFile != selectedBibliographyFile) {
                 selectedBibliographyFile = clickedBibliographyFile;
             }
         });
@@ -98,7 +99,7 @@ public class IndexController {
 
     @FXML
     public void showApp() {
-        if(login.getText() != null && !login.getText().trim().isEmpty()) {
+        if (login.getText() != null && !login.getText().trim().isEmpty()) {
             request.setUsername(login.getText().trim());
             token.setUsername(login.getText().trim());
             vBoxLogin.setVisible(false);
@@ -116,8 +117,7 @@ public class IndexController {
         listView.getItems().addAll(createBibliographyList());
     }
 
-    private ArrayList<Bibliography> createBibliographyList()
-    {
+    private ArrayList<Bibliography> createBibliographyList() {
         ArrayList<Bibliography> bibliographies = new ArrayList<>();
 
         String resp = null;
@@ -127,7 +127,7 @@ public class IndexController {
             e.printStackTrace();
         }
         JSONArray jArray = new JSONArray(resp);
-        for(int i=0; i < jArray.length(); i++){
+        for (int i = 0; i < jArray.length(); i++) {
             JSONObject jObject = jArray.getJSONObject(i);
             int id = jObject.getInt("id");
             String name = jObject.getString("name");
@@ -170,7 +170,7 @@ public class IndexController {
         String name = nameCreate.getText();
         String author = authorCreate.getText();
         LocalDate localDate = dateCreate.getValue();
-        if(name != null && author != null && localDate != null && !name.trim().isEmpty() && !author.isEmpty()) {
+        if (name != null && author != null && localDate != null && !name.trim().isEmpty() && !author.isEmpty()) {
             try {
                 String createToken = token.createBibliographyCreateToken();
                 request.createBibliography(name.trim(), author.trim(), localDate.toString(), createToken);
@@ -184,7 +184,7 @@ public class IndexController {
 
     @FXML
     public void showEditForm() {
-        if((selectedBibliography != null) && (listView.getSelectionModel().getSelectedItem() != null)) {
+        if ((selectedBibliography != null) && (listView.getSelectionModel().getSelectedItem() != null)) {
             vBoxCreate.setManaged(false);
             vBoxCreate.setVisible(false);
             vBoxDetails.setVisible(false);
@@ -203,7 +203,7 @@ public class IndexController {
         String name = nameEdit.getText();
         String author = authorEdit.getText();
         LocalDate localDate = dateEdit.getValue();
-        if(name != null && author != null && localDate != null && !name.trim().isEmpty() && !author.isEmpty()) {
+        if (name != null && author != null && localDate != null && !name.trim().isEmpty() && !author.isEmpty()) {
             try {
                 String editToken = token.createBibliographyEditToken();
                 request.editBibliography(id, name.trim(), author.trim(), localDate.toString(), editToken);
@@ -217,7 +217,7 @@ public class IndexController {
 
     @FXML
     public void deleteBibliography() {
-        if((selectedBibliography != null) && (listView.getSelectionModel().getSelectedItem() != null)) {
+        if ((selectedBibliography != null) && (listView.getSelectionModel().getSelectedItem() != null)) {
             try {
                 String deleteToken = token.createBibliographyDeleteToken();
                 request.deleteBibliography(String.valueOf(selectedBibliography.getId()), deleteToken);
@@ -251,8 +251,7 @@ public class IndexController {
         fileListView.getItems().addAll(createFileList());
     }
 
-    private ArrayList<BibliographyFile> createFileList()
-    {
+    private ArrayList<BibliographyFile> createFileList() {
         ArrayList<BibliographyFile> bibliographyFiles = new ArrayList<>();
 
         String resp = null;
@@ -262,7 +261,7 @@ public class IndexController {
             e.printStackTrace();
         }
         JSONArray jArray = new JSONArray(resp);
-        for(int i=0; i < jArray.length(); i++){
+        for (int i = 0; i < jArray.length(); i++) {
             JSONObject jObject = jArray.getJSONObject(i);
             int id = jObject.getInt("id");
             String fileName = jObject.getString("filename");
@@ -274,19 +273,35 @@ public class IndexController {
     }
 
     @FXML
+    public void uploadFIle() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        File selected = fileChooser.showOpenDialog(Main.getPrimaryStage());
+
+        if (selected != null) {
+            try {
+                request.uploadFile(selected, selectedBibliography.getId());
+                synchronizeFiles();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
     public void downloadFile() {
-        if((selectedBibliographyFile != null) && (fileListView.getSelectionModel().getSelectedItem() != null)) {
+        if ((selectedBibliographyFile != null) && (fileListView.getSelectionModel().getSelectedItem() != null)) {
             String downloadFileToken = token.createFileDownloadToken();
             try {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
                 File selectedDirectory = directoryChooser.showDialog(Main.getPrimaryStage());
 
-                if(selectedDirectory != null){
+                if (selectedDirectory != null) {
                     byte[] file = request.downloadFile(selectedBibliographyFile.getId(), downloadFileToken);
                     FileOutputStream fos = new FileOutputStream(selectedDirectory.getAbsolutePath() + "\\" + selectedBibliographyFile.getFileName());
                     fos.write(file);
                     fos.close();
-                    System.out.println(selectedDirectory.getAbsolutePath() + "\\dupa.pdf");
                 }
                 synchronizeFiles();
             } catch (IOException e) {
@@ -297,7 +312,7 @@ public class IndexController {
 
     @FXML
     public void deleteFile() {
-        if((selectedBibliographyFile != null) && (fileListView.getSelectionModel().getSelectedItem() != null)) {
+        if ((selectedBibliographyFile != null) && (fileListView.getSelectionModel().getSelectedItem() != null)) {
             String deleteFileToken = token.createFileDeleteToken();
             try {
                 request.deleteFile(selectedBibliographyFile.getId(), deleteFileToken);

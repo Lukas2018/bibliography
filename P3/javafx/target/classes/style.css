@@ -6,7 +6,7 @@
     -fx-border-insets: 8px;
     -fx-background-insets: 8px;
 }
-#vBoxLogin > .button {
+#vBoxLogin > .button, #hBoxFiles > .button, #vBoxDetails > .button {
     -fx-padding: 12px;
     -fx-border-insets: 8px;
     -fx-background-insets: 8px;

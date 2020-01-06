@@ -1,19 +1,20 @@
 package sample;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-import org.omg.CORBA.NameValuePair;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class Request {
-    private HttpURLConnection connection = null;
-    private URL url = null;
     private String targetURL = "http://localhost:5001/";
     private String username;
 
@@ -22,21 +23,20 @@ public class Request {
     }
 
     private String sendRequest(String target, String requestType, JSONObject json) throws IOException {
-        url = new URL(target);
-        connection = (HttpURLConnection) url.openConnection();
+        URL url = new URL(target);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(requestType);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept", "application/json");
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        if(json != null) {
+        if (json != null) {
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(json.toString());
             wr.flush();
             wr.close();
         }
         StringBuilder sb = new StringBuilder();
-        OutputStream out = new FileOutputStream("out.pdf");
         int HttpResult = connection.getResponseCode();
         if (HttpResult == HttpURLConnection.HTTP_OK) {
             BufferedReader br = new BufferedReader(
@@ -44,10 +44,8 @@ public class Request {
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line + "\n");
-                out.write(line.getBytes());
             }
             br.close();
-            out.close();
             System.out.println("" + sb.toString());
         } else {
             System.out.println(connection.getResponseMessage());
@@ -56,14 +54,14 @@ public class Request {
     }
 
     private byte[] getFileByRequest(String target, String requestType, JSONObject json) throws IOException {
-        url = new URL(target);
-        connection = (HttpURLConnection) url.openConnection();
+        URL url = new URL(target);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(requestType);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept", "application/json");
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        if(json != null) {
+        if (json != null) {
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(json.toString());
             wr.flush();
@@ -76,8 +74,7 @@ public class Request {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buf = new byte[131072];
             int n;
-            while (-1!=(n=in.read(buf)))
-            {
+            while (-1 != (n = in.read(buf))) {
                 out.write(buf, 0, n);
             }
             out.close();
@@ -89,6 +86,20 @@ public class Request {
         }
         return file;
 
+    }
+
+    public void uploadFilePost(String target, File file) throws IOException {
+        HttpEntity entity = MultipartEntityBuilder.create()
+                .addPart("file", new FileBody(file))
+                .build();
+
+        HttpPost request = new HttpPost(target);
+        request.setEntity(entity);
+
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(request);
+        String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+        System.out.println(responseString);
     }
 
     public String getListOfBibliographies() throws IOException {
@@ -126,6 +137,11 @@ public class Request {
     public String getListOfFiles(int bibliographyId) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId + "/details";
         return sendRequest(target, "GET", null);
+    }
+
+    public void uploadFile(File file, int bibliographyId) throws IOException {
+        String target = targetURL + username + "/bibliography/" + bibliographyId + "/file/upload";
+        uploadFilePost(target, file);
     }
 
     public byte[] downloadFile(int fileId, String token) throws IOException {

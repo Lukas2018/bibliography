@@ -11,12 +11,13 @@ import java.util.Map;
 
 public class Token {
     private String username;
-    private final int JWT_TOKEN_TIME_VALIDITY = 5*60;
+    private final int JWT_TOKEN_TIME_VALIDITY = 5 * 60;
     private String secret = "secret_key";
 
     public void setUsername(String username) {
         this.username = username;
     }
+
     private String createJWT(Map<String, Object> claims) {
         try {
             return Jwts.builder().setClaims(claims)
@@ -52,15 +53,6 @@ public class Token {
         claims.put("user", username);
         claims.put("bibliography", true);
         claims.put("delete", true);
-        return createJWT(claims);
-    }
-
-    public String createFileUploadToken() {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("iss", "desktop");
-        claims.put("user", username);
-        claims.put("file", true);
-        claims.put("upload", true);
         return createJWT(claims);
     }
 
