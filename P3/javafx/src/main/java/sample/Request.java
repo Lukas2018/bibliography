@@ -36,6 +36,7 @@ public class Request {
             wr.close();
         }
         StringBuilder sb = new StringBuilder();
+        OutputStream out = new FileOutputStream("out.pdf");
         int HttpResult = connection.getResponseCode();
         if (HttpResult == HttpURLConnection.HTTP_OK) {
             BufferedReader br = new BufferedReader(
@@ -43,8 +44,10 @@ public class Request {
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line + "\n");
+                out.write(line.getBytes());
             }
             br.close();
+            out.close();
             System.out.println("" + sb.toString());
         } else {
             System.out.println(connection.getResponseMessage());
@@ -52,40 +55,90 @@ public class Request {
         return sb.toString();
     }
 
+    private byte[] getFileByRequest(String target, String requestType, JSONObject json) throws IOException {
+        url = new URL(target);
+        connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(requestType);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        if(json != null) {
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(json.toString());
+            wr.flush();
+            wr.close();
+        }
+        int HttpResult = connection.getResponseCode();
+        byte[] file = null;
+        if (HttpResult == HttpURLConnection.HTTP_OK) {
+            InputStream in = connection.getInputStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[131072];
+            int n;
+            while (-1!=(n=in.read(buf)))
+            {
+                out.write(buf, 0, n);
+            }
+            out.close();
+            in.close();
+            file = out.toByteArray();
+            return file;
+        } else {
+            System.out.println(connection.getResponseMessage());
+        }
+        return file;
+
+    }
+
     public String getListOfBibliographies() throws IOException {
         String target = targetURL + username;
         return sendRequest(target, "GET", null);
     }
 
-    public String createBibliography(String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
+    public void createBibliography(String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography";
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
         json.put("date", bibliographyDate);
         json.put("token", token);
-        return sendRequest(target, "POST", json);
+        sendRequest(target, "POST", json);
     }
 
-    public String editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
+    public void editBibliography(int bibliographyId, String bibliographyName, String bibliographyAuthor, String bibliographyDate, String token) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId;
         JSONObject json = new JSONObject();
         json.put("name", bibliographyName);
         json.put("author", bibliographyAuthor);
         json.put("date", bibliographyDate);
         json.put("token", token);
-        return sendRequest(target, "POST", json);
+        sendRequest(target, "POST", json);
     }
 
-    public String deleteBibliography(String bibliographyId, String token) throws IOException {
+    public void deleteBibliography(String bibliographyId, String token) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId;
         JSONObject json = new JSONObject();
         json.put("token", token);
-        return sendRequest(target, "DELETE", json);
+        sendRequest(target, "DELETE", json);
     }
 
     public String getListOfFiles(int bibliographyId) throws IOException {
         String target = targetURL + username + "/bibliography/" + bibliographyId + "/details";
         return sendRequest(target, "GET", null);
+    }
+
+    public byte[] downloadFile(int fileId, String token) throws IOException {
+        String target = targetURL + username + "/bibliography/file/" + fileId + "/download";
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        return getFileByRequest(target, "POST", json);
+    }
+
+    public void deleteFile(int fileId, String token) throws IOException {
+        String target = targetURL + username + "/bibliography/file/" + fileId + "/delete";
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        sendRequest(target, "DELETE", json);
     }
 }

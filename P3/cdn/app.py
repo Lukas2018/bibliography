@@ -111,7 +111,7 @@ def upload(username, id):
     return make_response('Pomyślnie dodano plik', 200)
 
 
-@app.route('/<username>/bibliography/file/<id>/download')
+@app.route('/<username>/bibliography/file/<id>/download', methods=['GET', 'POST'])
 def download(username, id):
     token = request.json['token']
     if token is None:
