@@ -12,7 +12,7 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.wrappers import Response
 
 from config import Config
-from forms import RegisterForm, LoginForm, BibliographyForm
+from forms import BibliographyForm
 import tokens
 
 from authlib.flask.client import OAuth
@@ -33,9 +33,9 @@ auth0 = oauth.register(
     'auth0',
     client_id=Config.CLIENT_ID,
     client_secret=Config.CLIENT_SECRET,
-    api_base_url='https://dev-5dyvvc7u.eu.auth0.com',
-    access_token_url='https://dev-5dyvvc7u.eu.auth0.com/oauth/token',
-    authorize_url='https://dev-5dyvvc7u.eu.auth0.com/authorize',
+    api_base_url=Config.API_BASE_URL,
+    access_token_url=Config.ACCESS_TOKEN_URL,
+    authorize_url=Config.AUTHORIZE_URL,
     client_kwargs={
         'scope': 'openid profile email',
     },
@@ -61,26 +61,15 @@ def requires_auth(f):
         if session.get_username_by_session(session_id) is None:
             return redirect('/login')
         return f(*args, **kwargs)
+
     return decorated
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        user.add_user(username, password)
-        return redirect('/login')
-    return render_template('register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
     if request.method == 'POST':
         return auth0.authorize_redirect(redirect_uri='http://localhost:5000/callback')
-    return render_template('login.html', form=form)
+    return render_template('login.html')
 
 
 @app.route('/callback')
