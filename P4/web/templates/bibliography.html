@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content">
+        <a id="logout" href="/logout"> Wyloguj się </a>
+        <div class="files">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for category, message in messages %}
+                            <li class="alert-{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <p>Nazwa: {{ bibliography['name'] }}</p>
+            <p>Autor: {{ bibliography['author'] }}</p>
+            <p>Data wydania: {{ bibliography['date'] }}</p>
+            <p>Opublikowano przez: {{ bibliography['owner'] }}</p>
+            <p>Data publikacji: {{ bibliography['publication_date'] }}</p>
+            <br><br>
+            {% if files %}
+                {% for file in files %}
+                    <div class="row bibliography_files">
+                        <ul>
+                            <li class="col-md-8 form-group">
+                                <p>{{ file['filename'] }}</p>
+                            </li>
+                            <li class="col-md-2 form-group">
+                                <form class="download" action="/download" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="file" value="{{file}}" />
+                                    <p><input class="btn btn-warning" type="submit" value="Pobierz"/></p>
+                                </form>
+                            </li>
+                            <li class="col-md-2 form-group">
+                                <form class="delete" action="/delete" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="bibliography" value="{{bibliography}}" />
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="file" value="{{file}}" />
+                                    <p><input class="btn btn-danger" type="submit" value="Usuń"/></p>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aktualnie brak plików w bibliografii</p>
+            {% endif %}
+            <div class="upload">
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <ul>
+                        <li class="col-md-6 form-group">
+                            <input type="hidden" name="bibliography" value="{{bibliography}}" />
+                            <input type="file" name="file" accept="application/pdf" required/>
+                        </li>
+                        <li class="col-md-6 form-group">
+                            <input class="btn btn-primary" type="submit" value="Prześlij"/>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        <a href="{{ url_for('index') }}" class="col-md-12 form-group btn btn-primary btn-block active" style="margin-bottom: 10px;">Wróć</a>
+        </div>
+    </div>
+{% endblock %}

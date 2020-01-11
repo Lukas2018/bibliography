@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.IndexController">
+    <children>
+        <HBox prefHeight="478.0" prefWidth="504.0">
+            <children>
+                <VBox fx:id="vBoxMenu" alignment="CENTER_LEFT">
+                    <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="110.0"
+                               text="Twoje bibliografie:"/>
+                        <Button fx:id="synchronizeButton" mnemonicParsing="false" onAction="#synchronize"
+                                prefHeight="26.0" prefWidth="120.0" text="Synchronizuj"/>
+                        <ListView fx:id="listView" prefHeight="400.0" prefWidth="0.0"/>
+                        <Button fx:id="addBibliographyButton" mnemonicParsing="false" onAction="#showCreateForm"
+                                prefHeight="26.0" prefWidth="120.0" text="Dodaj bibliografie"/>
+                        <Button fx:id="editBibliographyButton" mnemonicParsing="false" onAction="#showEditForm"
+                                prefHeight="26.0" prefWidth="120.0" text="Edytuj bibliografie"/>
+                        <Button fx:id="deleteBibliographyButton" mnemonicParsing="false" onAction="#deleteBibliography"
+                                prefHeight="26.0" prefWidth="120.0" text="Usuń bibliografie"/>
+                    </children>
+                </VBox>
+                <VBox fx:id="vBoxLogin" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER">
+                    <children>
+                        <Label fx:id="loginLabel" alignment="CENTER" prefHeight="18.0" text="Wpisz nazwę użytkownika"/>
+                        <TextField fx:id="login" alignment="CENTER" prefWidth="300" maxWidth="300" prefHeight="26.0"/>
+                        <Button fx:id="loginButton" alignment="CENTER" contentDisplay="TEXT_ONLY"
+                                mnemonicParsing="false" onAction="#showApp" text="Zatwierdź"/>
+                    </children>
+                </VBox>
+                <VBox fx:id="vBoxCreate" alignment="CENTER" prefHeight="478.0" prefWidth="394.0">
+                    <children>
+                        <Label prefHeight="18.0" text="Nazwa"/>
+                        <TextField fx:id="nameCreate" alignment="CENTER" prefHeight="26.0" prefWidth="250"
+                                   maxWidth="250"/>
+                        <Label text="Autor"/>
+                        <TextField fx:id="authorCreate" alignment="CENTER" prefHeight="26.0" prefWidth="250"
+                                   maxWidth="250"/>
+                        <Label text="Data"/>
+                        <DatePicker fx:id="dateCreate" prefHeight="26.0" prefWidth="250"/>
+                        <Button alignment="CENTER" contentDisplay="TEXT_ONLY" mnemonicParsing="false"
+                                onAction="#submitCreate" text="Dodaj bibliografie"/>
+                    </children>
+                </VBox>
+                <VBox fx:id="vBoxEdit" alignment="CENTER" prefHeight="478.0" prefWidth="394.0">
+                    <children>
+                        <Label prefHeight="18.0" text="Nazwa"/>
+                        <TextField fx:id="nameEdit" alignment="CENTER" prefHeight="26.0" prefWidth="250"
+                                   maxWidth="250"/>
+                        <Label text="Autor"/>
+                        <TextField fx:id="authorEdit" alignment="CENTER" prefHeight="26.0" prefWidth="250"
+                                   maxWidth="250"/>
+                        <Label text="Data"/>
+                        <DatePicker fx:id="dateEdit" prefHeight="26.0" prefWidth="250"/>
+                        <Button alignment="CENTER" contentDisplay="TEXT_ONLY" mnemonicParsing="false"
+                                onAction="#submitEdit" text="Zapisz zmiany"/>
+                    </children>
+                </VBox>
+                <VBox fx:id="vBoxDetails" alignment="CENTER" prefHeight="478.0" prefWidth="394.0">
+                    <children>
+                        <Label fx:id="nameDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="authorDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="dateDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="ownerDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label fx:id="publicationDateDetails" prefHeight="18.0" prefWidth="250" maxWidth="250"/>
+                        <Label prefWidth="250" maxWidth="250" text="Lista plików:"/>
+                        <ListView fx:id="fileListView" prefHeight="200.0" prefWidth="0.0"/>
+                        <HBox fx:id="hBoxFiles" alignment="CENTER" spacing="50">
+                            <Button text="Dodaj plik" alignment="CENTER" onAction="#uploadFIle"></Button>
+                            <Button text="Pobierz plik" onAction="#downloadFile"></Button>
+                            <Button text="Usuń plik" onAction="#deleteFile"></Button>
+                        </HBox>
+                        <Button text="Synchronizuj pliki" onAction="#synchronizeFiles"></Button>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints/>
+    </rowConstraints>
+    <stylesheets>
+        <URL value="@style.css"/>
+    </stylesheets>
+</GridPane>

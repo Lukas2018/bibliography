@@ -1,0 +1,92 @@
+body {
+	width: 100%;
+	background-image: url("/static/media/vintage-leaves.png");
+}
+#register, #login .content{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.form, .files, .bibliographies {
+	max-width: 600px;
+	border: 2px solid black;
+	border-radius: 20px;
+	margin: auto;
+	background-color: rgb(242, 242, 242);
+	padding-top: 20px;
+	position: absolute;
+	top: 5%;
+	left: 0;
+	right: 0;
+	box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+.form h1 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.form input {
+	padding-left: 5px;
+}
+
+.form ul, .files ul, .flashes, .operations ul{
+	list-style: none;
+	padding: 0;
+}
+
+.form label {
+	padding-left: 5px;
+}
+
+.form label b, #login_form p, .files li, .files p, .bibliographies p {
+	padding-left: 15px;
+}
+
+.invalid_data {
+	color: red;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+
+#logout {
+	position: absolute;
+    right: 5%;
+    top: 2%;
+	border: 2px solid black;
+	border-radius: 15px;
+	margin: auto;
+	background-color: rgb(242, 242, 242);
+	padding: 5px
+}
+
+.operations {
+	margin: 10px 5px;
+	padding: 5px;
+	border: 2px solid black;
+	border-radius: 15px;
+	text-align: center;
+}
+
+.operations.create {
+	border: none;
+	text-align: left;
+}
+
+.operations li, .bibliography_files li {
+	padding-left: 0;
+}
+
+.files .bibliography_files {
+	width: 85%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.download {
+	width: 100%;
+}
+.content h2 {
+	text-align: center;
+}
