@@ -2,12 +2,14 @@ import json
 from datetime import datetime
 from io import BytesIO
 
-from flask import Flask, send_file
+from flask import Flask, send_file, Response
 from flask import make_response
 from flask import request
+from flask_cors import cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from jwt import decode, InvalidTokenError
 
+import notifications
 from config import Config
 
 app = Flask(__name__)
@@ -50,7 +52,15 @@ def create_bibliography(username):
     bibliography.publication_date = datetime.strptime(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
                                                       '%Y-%m-%d %H:%M:%S')
     bibliography_storage.add_bibliography(bibliography)
+    message = "Użytkownik " + username + " dodał bibliografię: " + bibliography.name
+    notifications.add_notification_to_user(username, message)
     return make_response('Poprawnie dodano bibliografie', 200)
+
+
+@app.route("/event/<username>")
+@cross_origin()
+def event(username):
+    return Response(notifications.event_stream(username), mimetype="text/event-stream")
 
 
 @app.route('/<username>/bibliography/<id>', methods=['POST'])

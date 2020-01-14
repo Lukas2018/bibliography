@@ -3,3 +3,4 @@ pyjwt
 requests
 python-dotenv
 flask_sqlalchemy
+flask_cors
