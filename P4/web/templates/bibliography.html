@@ -62,5 +62,12 @@
             </div>
         <a href="{{ url_for('index') }}" class="col-md-12 form-group btn btn-primary btn-block active" style="margin-bottom: 10px;">Wróć</a>
         </div>
+        <div id="notification">
+            <p id="notification_text"></p>
+            <button onclick="document.getElementById('notification').style.display = 'none'">OK</button>
+        </div>
     </div>
+{% endblock %}
+{% block jsimports %}
+    <script src="/static/js/script.js"></script>
 {% endblock %}

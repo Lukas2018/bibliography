@@ -67,7 +67,7 @@ body {
 	border-radius: 15px;
 	margin: auto;
 	background-color: rgb(242, 242, 242);
-	padding: 5px
+	padding: 5px;
 }
 
 .operations {
@@ -96,6 +96,18 @@ body {
 .download {
 	width: 100%;
 }
+
 .content h2 {
 	text-align: center;
+}
+
+#notification {
+	border: 2px solid black;
+	border-radius: 20px;
+	margin: auto;
+	background-color: rgb(242, 242, 242);
+	padding-bottom: 20px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
 }

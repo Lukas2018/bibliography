@@ -1,10 +1,15 @@
+import time
+
 notifications = {}
 
 
 def event_stream(username):
     if username in notifications:
-        while notifications[username]:
-            yield 'data: %s\n\n' % notifications[username].pop(0)
+        for msg in notifications[username]:
+            time.sleep(5)
+            if notifications[username]:
+                notifications[username].pop(0)
+            yield 'data: %s\n\n' % msg
 
 
 def add_notification_to_user(username, message):
