@@ -112,6 +112,14 @@ def upload(username, id):
     file = request.files['file']
     if file is None:
         return make_response('Nie podano pliku', 401)
+    token = request.args.get('token')
+    if token is None:
+        return make_response('Brak tokenu', 401)
+    if not valid(token):
+        return make_response('Nieważny token', 401)
+    payload = decode(token, JWT_SECRET)
+    if payload.get('user') != username or not payload.get('file') or not payload.get('upload'):
+        return make_response('Nieprawidłowa zawartość tokenu', 401)
     new_file = File(filename=file.filename, data=file.read(), bibliography_id=int(id))
     bibliography_storage.upload_file(new_file)
     return make_response('Pomyślnie dodano plik', 200)

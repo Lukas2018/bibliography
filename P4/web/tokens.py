@@ -46,6 +46,19 @@ def create_bibliography_delete_token(username):
     return encode(payload, JWT_SECRET, 'HS256').decode()
 
 
+def create_upload_token(username):
+    exp = datetime.datetime.now() + datetime.timedelta(minutes=JWT_SESSION_TIME)
+    payload = {
+        "iss": "web",
+        "exp": exp,
+        "user": username,
+        "file": True,
+        "upload": True
+    }
+
+    return encode(payload, JWT_SECRET, 'HS256').decode()
+
+
 def create_download_token(username):
     exp = datetime.datetime.now() + datetime.timedelta(minutes=JWT_SESSION_TIME)
     payload = {

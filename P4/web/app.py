@@ -198,6 +198,10 @@ def bibliography_details():
 def upload_file():
     session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
+    token = tokens.create_upload_token(username)
+    params = {
+        'token': token
+    }
     file = request.files.get('file')
     files = {
         'file': (file.filename, file)
@@ -205,7 +209,7 @@ def upload_file():
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
     resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload',
-                         files=files)
+                         params=params, files=files)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
