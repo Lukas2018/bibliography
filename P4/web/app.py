@@ -42,6 +42,17 @@ auth0 = oauth.register(
 )
 
 
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        session_id = request.cookies.get('session_id')
+        if session.get_username_by_session(session_id) is None:
+            return redirect('/login')
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -52,17 +63,6 @@ def index():
         bibliographies = json.loads(response.text)
         return render_template('index.html', username=username, bibliographies=bibliographies)
     return redirect("/login")
-
-
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        session_id = request.cookies.get('session_id')
-        if session.get_username_by_session(session_id) is None:
-            return redirect('/login')
-        return f(*args, **kwargs)
-
-    return decorated
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,10 +100,10 @@ def logout():
 @requires_auth
 def create_bibliography():
     form = BibliographyForm()
+    session_id = request.cookies.get('session_id')
+    username = session.get_username_by_session(session_id)
     if form.validate_on_submit():
         response = make_response(redirect('/index'))
-        session_id = request.cookies.get('session_id')
-        username = session.get_username_by_session(session_id)
         token = tokens.create_bibliography_add_token(username)
         data = {
             'name': form.name.data,
@@ -117,7 +117,7 @@ def create_bibliography():
         else:
             flash(resp.content.decode(), 'warning')
         return response
-    return render_template('create_bibliography.html', form=form)
+    return render_template('create_bibliography.html', username=username, form=form)
 
 
 @app.route('/edit_bibliography', methods=['POST'])
@@ -129,7 +129,8 @@ def edit_bibliography_form():
     bibliography['date'] = bibliography['date'][:10]
     bibliography['date'] = str(datetime.datetime.strptime(bibliography['date'], '%Y-%m-%d'))
     bibliography['date'] = bibliography['date'][:10]
-    return render_template('edit_bibliography.html', form=form, bibliography=bibliography)
+    username = session.get_username_by_session(request.cookies.get('session_id'))
+    return render_template('edit_bibliography.html', username=username, form=form, bibliography=bibliography)
 
 
 @app.route('/save_edit_bibliography', methods=['POST'])
@@ -189,7 +190,7 @@ def bibliography_details():
     username = session.get_username_by_session(session_id)
     resp = requests.get('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/details')
     files = json.loads(resp.text)
-    return render_template('bibliography.html', files=files, bibliography=bibliography)
+    return render_template('bibliography.html', username=username, files=files, bibliography=bibliography)
 
 
 @app.route('/upload', methods=['POST'])

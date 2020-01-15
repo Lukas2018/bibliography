@@ -102,12 +102,14 @@ body {
 }
 
 #notification {
+    text-align: center;
 	border: 2px solid black;
-	border-radius: 20px;
-	margin: auto;
+	margin-left: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
 	background-color: rgb(242, 242, 242);
-	padding-bottom: 20px;
-	position: absolute;
+	max-width: 200px;
+	position: fixed;
 	left: 0;
 	bottom: 0;
 }

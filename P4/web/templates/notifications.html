@@ -1,0 +1,13 @@
+{% block body %}
+<script type="text/javascript">
+        let notification = document.getElementById("notification");
+        notification.style.display = "none";
+		let username = '{{ username }}';
+		let source = new EventSource('http://localhost:5001/event/' + username, {"Access-Control-Allow-Origin": true});
+		source.onmessage = function (event) {
+			document.getElementById("notification_text").innerHTML = "";
+            document.getElementById("notification_text").innerHTML = event.data;
+            notification.style.display = "block";
+		}
+	</script>
+{% endblock %}
