@@ -7,6 +7,11 @@ def get_user_bibliographies(username):
     return bibliographies
 
 
+def get_bibliography(bibliography_id):
+    bibliography = Bibliography.query.filter_by(id=bibliography_id).first()
+    return bibliography
+
+
 def get_bibliography_files(bibliography_id):
     bibliography = Bibliography.query.filter_by(id=bibliography_id).first()
     return bibliography.files

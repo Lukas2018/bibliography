@@ -26,14 +26,14 @@
                                 <p>{{ file['filename'] }}</p>
                             </li>
                             <li class="col-md-2 form-group">
-                                <form class="download" action="/download" method="POST" enctype="multipart/form-data">
+                                <form class="download" action="/download" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="file" value="{{file}}" />
                                     <p><input class="btn btn-warning" type="submit" value="Pobierz"/></p>
                                 </form>
                             </li>
                             <li class="col-md-2 form-group">
-                                <form class="delete" action="/delete" method="POST" enctype="multipart/form-data">
+                                <form class="delete" action="/delete" method="POST">
                                     <input type="hidden" name="bibliography" value="{{bibliography}}" />
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="file" value="{{file}}" />
@@ -64,7 +64,7 @@
         </div>
         <div id="notification">
             <p id="notification_text"></p>
-            <button onclick="document.getElementById('notification').style.display = 'none'">OK</button>
+            <button id="closeButton">OK</button>
         </div>
     </div>
 {% endblock %}

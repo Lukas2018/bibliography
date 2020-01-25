@@ -41,6 +41,14 @@ def list_user_bibliographies():
     return jsonify([bibliography.to_dict() for bibliography in bibliographies])
 
 
+@app.route('/bibliography/<bibliography_id>', methods=['GET'])
+def get_bibliography(bibliography_id):
+    bibliography = bibliography_storage.get_bibliography(int(bibliography_id))
+    if bibliography is None:
+        return json.dumps("")
+    return jsonify(bibliography.to_dict())
+
+
 @app.route('/bibliography', methods=['POST'])
 def create_bibliography():
     res = request.json
@@ -72,7 +80,7 @@ def event(username):
     return Response(notifications.event_stream(username), mimetype="text/event-stream")
 
 
-@app.route('/bibliography/<id>', methods=['POST'])
+@app.route('/bibliography/<bibliography_id>', methods=['POST'])
 def edit_bibliography(bibliography_id):
     res = request.json
     token = request.headers.get('Authorization')
@@ -94,7 +102,7 @@ def edit_bibliography(bibliography_id):
     return make_response('Poprawnie edytowano bibliografie', 200)
 
 
-@app.route('/bibliography/<id>', methods=['DELETE'])
+@app.route('/bibliography/<bibliography_id>', methods=['DELETE'])
 def delete_bibliography(bibliography_id):
     token = request.headers.get('Authorization')
     if token is None:
@@ -108,7 +116,7 @@ def delete_bibliography(bibliography_id):
     return make_response('Poprawnie usunięto bibliografie', 200)
 
 
-@app.route('/bibliography/<id>', methods=['GET'])
+@app.route('/bibliography/<bibliography_id>/file', methods=['GET'])
 def list_bibliography_files(bibliography_id):
     token = request.headers.get('Authorization')
     if token is None:
@@ -124,8 +132,8 @@ def list_bibliography_files(bibliography_id):
     return jsonify([file.to_dict() for file in files])
 
 
-@app.route('/bibliography/<id>/file', methods=['POST'])
-def upload(bibliography_id):
+@app.route('/bibliography/<bibliography_id>/file', methods=['POST'])
+def upload_file(bibliography_id):
     file = request.files['file']
     if file is None:
         return make_response('Nie podano pliku', 401)
@@ -142,8 +150,8 @@ def upload(bibliography_id):
     return make_response('Pomyślnie dodano plik', 200)
 
 
-@app.route('/bibliography/file/<id>', methods=['GET'])
-def download(file_id):
+@app.route('/bibliography/file/<file_id>', methods=['GET'])
+def download_file(file_id):
     token = request.headers.get('Authorization')
     if token is None:
         return make_response('Brak tokenu', 401)
@@ -156,8 +164,8 @@ def download(file_id):
     return send_file(BytesIO(file.data), attachment_filename="plik.pdf", as_attachment=True)
 
 
-@app.route('/bibliography/file/<id>', methods=['DELETE'])
-def delete(bibliography_id):
+@app.route('/bibliography/file/<file_id>', methods=['DELETE'])
+def delete_file(file_id):
     token = request.headers.get('Authorization')
     if token is None:
         return make_response('Brak tokenu', 401)
@@ -166,7 +174,7 @@ def delete(bibliography_id):
     payload = decode(token, JWT_SECRET)
     if not payload.get('file') or not payload.get('delete'):
         return make_response('Nieprawidłowa zawartość tokenu', 401)
-    bibliography_storage.delete_file(bibliography_id)
+    bibliography_storage.delete_file(file_id)
     return make_response('Pomyślnie usunięto plik', 200)
 
 

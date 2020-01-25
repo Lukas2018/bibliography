@@ -4,10 +4,11 @@ from functools import wraps
 
 import requests
 
-from flask import Flask, make_response, flash, url_for
+from flask import Flask, make_response, flash, url_for, jsonify
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.wrappers import Response
 
@@ -19,6 +20,19 @@ from authlib.flask.client import OAuth
 from six.moves.urllib.parse import urlencode
 
 app = Flask(__name__)
+csp = {
+    'script-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'maxcdn.bootstrapcdn.com',
+    ],
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'maxcdn.bootstrapcdn.com',
+    ],
+}
+talisman = Talisman(app, content_security_policy=csp, content_security_policy_nonce_in=['script-src'])
 app.config.from_object(Config)
 csrf = CSRFProtect(app)
 app.config['SECRET_KEY'] = Config.SECRET_KEY
@@ -59,8 +73,12 @@ def index():
     session_id = request.cookies.get('session_id')
     if session_id:
         username = session.get_username_by_session(session_id)
-        response = requests.get('http://cdn:5000/' + username)
-        bibliographies = json.loads(response.text)
+        token = tokens.create_bibliography_list_token(username)
+        headers = {
+            "Authorization": token
+        }
+        response = requests.get('http://cdn:5000/bibliography', headers=headers)
+        bibliographies = response.json()
         return render_template('index.html', username=username, bibliographies=bibliographies)
     return redirect("/login")
 
@@ -68,7 +86,7 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        return auth0.authorize_redirect(redirect_uri='http://localhost:5000/callback')
+        return auth0.authorize_redirect(redirect_uri='https://localhost:5000/callback')
     return render_template('login.html')
 
 
@@ -82,7 +100,7 @@ def callback_calling():
     expire = session.get_session_expire_date(session_id)
     format = '%Y-%m-%d %H:%M:%S.%f'
     expire = datetime.datetime.strptime(expire.decode(), format) - datetime.datetime.now()
-    response.set_cookie('session_id', session_id, httponly=True, max_age=expire)
+    response.set_cookie('session_id', session_id, httponly=True, secure=True, max_age=expire)
     return response
 
 
@@ -92,7 +110,7 @@ def logout():
     session.end_session(session_id)
     response = make_response()
     response.set_cookie('session_id', '', httponly=True, expires=0)
-    params = {'returnTo': url_for('login', _external=True), 'client_id': 'Jx6rTiO6OnUT8Abjtuovsokysi4JILtK'}
+    params = {'returnTo': url_for('login', _external=True), 'client_id': Config.CLIENT_ID}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
@@ -105,13 +123,15 @@ def create_bibliography():
     if form.validate_on_submit():
         response = make_response(redirect('/index'))
         token = tokens.create_bibliography_add_token(username)
+        headers = {
+            "Authorization": token
+        }
         data = {
             'name': form.name.data,
             'author': form.author.data,
             'date': str(form.date.data),
-            'token': token
         }
-        resp = requests.post('http://cdn:5000/' + username + '/bibliography', json=data)
+        resp = requests.post('http://cdn:5000/bibliography', json=data, headers=headers)
         if resp.status_code == 200:
             flash(resp.content.decode(), 'success')
         else:
@@ -144,13 +164,15 @@ def edit_bibliography():
         session_id = request.cookies.get('session_id')
         username = session.get_username_by_session(session_id)
         token = tokens.create_bibliography_edit_token(username)
+        headers = {
+            "Authorization": token
+        }
         data = {
             'name': form.name.data,
             'author': form.author.data,
             'date': str(form.date.data),
-            'token': token
         }
-        resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), json=data)
+        resp = requests.post('http://cdn:5000/bibliography/' + str(bibliography['id']), json=data, headers=headers)
         if resp.status_code == 200:
             flash(resp.content.decode(), 'success')
         else:
@@ -167,10 +189,10 @@ def delete_bibliography():
     session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
     token = tokens.create_bibliography_delete_token(username)
-    data = {
-        'token': token
+    headers = {
+        "Authorization": token
     }
-    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']), json=data)
+    resp = requests.delete('http://cdn:5000/bibliography/' + str(bibliography['id']), headers=headers)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
@@ -181,15 +203,21 @@ def delete_bibliography():
 @app.route('/bibliography_details', methods=['GET', 'POST'])
 @requires_auth
 def bibliography_details():
+    session_id = request.cookies.get('session_id')
     if request.method == 'GET':
-        bibliography = json.loads(request.args['messages'])
+        id = (json.loads(request.args['messages']))['id']
+        bibliography = requests.get('http://cdn:5000/bibliography/' + str(id))
+        bibliography = bibliography.json()
     else:
         bibliography = request.form.get('bibliography')
         bibliography = json.loads(bibliography.replace("\'", "\""))
-    session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
-    resp = requests.get('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/details')
-    files = json.loads(resp.text)
+    token = tokens.create_file_list_token(username)
+    headers = {
+        "Authorization": token
+    }
+    resp = requests.get('http://cdn:5000/bibliography/' + str(bibliography['id']) + '/file', headers=headers)
+    files = resp.json()
     return render_template('bibliography.html', username=username, files=files, bibliography=bibliography)
 
 
@@ -198,9 +226,9 @@ def bibliography_details():
 def upload_file():
     session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
-    token = tokens.create_upload_token(username)
-    params = {
-        'token': token
+    token = tokens.create_file_upload_token(username)
+    headers = {
+        'Authorization': token
     }
     file = request.files.get('file')
     files = {
@@ -208,13 +236,16 @@ def upload_file():
     }
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
-    resp = requests.post('http://cdn:5000/' + username + '/bibliography/' + str(bibliography['id']) + '/file/upload',
-                         params=params, files=files)
+    resp = requests.post('http://cdn:5000/bibliography/' + str(bibliography['id']) + '/file', headers=headers,
+                         files=files)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
         flash(resp.content.decode(), 'warning')
-    messages = json.dumps(bibliography)
+    id = {
+        'id': bibliography['id']
+    }
+    messages = json.dumps(id)
     response = make_response(redirect(url_for('bibliography_details', messages=messages)))
     return response
 
@@ -224,14 +255,13 @@ def upload_file():
 def download_file():
     session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
-    token = tokens.create_download_token(username)
+    token = tokens.create_file_download_token(username)
     file = request.form.get('file')
     file = json.loads(file.replace("\'", "\""))
-    data = {
-        'token': token
+    headers = {
+        'Authorization': token
     }
-    resp = requests.get('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/download',
-                        json=data)
+    resp = requests.get('http://cdn:5000/bibliography/file/' + str(file['id']), headers=headers)
     response = Response(response=resp.content, content_type='application/pdf')
     return response
 
@@ -241,21 +271,23 @@ def download_file():
 def delete_file():
     session_id = request.cookies.get('session_id')
     username = session.get_username_by_session(session_id)
-    token = tokens.create_delete_file_token(username)
+    token = tokens.create_file_delete_token(username)
     file = request.form.get('file')
     file = json.loads(file.replace("\'", "\""))
-    data = {
-        'token': token
+    headers = {
+        'Authorization': token
     }
-    resp = requests.delete('http://cdn:5000/' + username + '/bibliography/file/' + str(file['id']) + '/delete',
-                           json=data)
+    resp = requests.delete('http://cdn:5000/bibliography/file/' + str(file['id']), headers=headers)
     if resp.status_code == 200:
         flash(resp.content.decode(), 'success')
     else:
         flash(resp.content.decode(), 'warning')
     bibliography = request.form.get('bibliography')
     bibliography = json.loads(bibliography.replace("\'", "\""))
-    messages = json.dumps(bibliography)
+    id = {
+        'id': bibliography['id']
+    }
+    messages = json.dumps(id)
     response = make_response(redirect(url_for('bibliography_details', messages=messages)))
     return response
 

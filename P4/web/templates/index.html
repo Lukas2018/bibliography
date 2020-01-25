@@ -18,11 +18,7 @@
                     <ul>
                         <div class="row justify-content-start">
                             <li class="col-md-12 form-group">
-                                <form action="/bibliography_details" id="details{{ loop.index }}" method="POST">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                    <input type="hidden" name="bibliography" value="{{bibliography}}" />
-                                    <h3><p><a href="#" onclick="document.getElementById('details{{ loop.index }}').submit();">{{ bibliography['name'] }}</a></p></h3>
-                                </form>
+                                <h3>{{ bibliography['name'] }}</h3>
                             </li>
                         </div>
                         <div class="row justify-content-end">
@@ -32,21 +28,21 @@
                         </div>
                         <div class="row">
                             <li class="col-md-4 form-group">
-                                <form action="/bibliography_details" method="POST" enctype="multipart/form-data">
+                                <form action="/bibliography_details" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="bibliography" value="{{ bibliography }}" />
                                     <p><input class="btn btn-info" type="submit" value="Szczegóły"/></p>
                                 </form>
                             </li>
                             <li class="col-md-4 form-group">
-                                <form action="/edit_bibliography" method="POST" enctype="multipart/form-data">
+                                <form action="/edit_bibliography" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="bibliography" value="{{ bibliography }}" />
                                     <p><input class="btn btn-warning" type="submit" value="Edytuj"/></p>
                                 </form>
                             </li>
                             <li class="col-md-4 form-group">
-                                <form action="/delete_bibliography" method="POST" enctype="multipart/form-data">
+                                <form action="/delete_bibliography" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <input type="hidden" name="bibliography" value="{{bibliography}}" />
                                     <p><input class="btn btn-danger" type="submit" value="Usuń"/></p>
@@ -60,14 +56,14 @@
                 <p>Twoja bibliografia jest pusta.</p>
             {% endif %}
             <div class="operations create">
-                <form action="/create_bibliography" method="GET" enctype="multipart/form-data">
+                <form action="/create_bibliography" method="GET">
                     <input class="btn btn-primary" type="submit" value="Dodaj bibliografie" name="Submit" />
                 </form>
             </div>
         </div>
         <div id="notification">
             <p id="notification_text"></p>
-            <button onclick="document.getElementById('notification').style.display = 'none'">OK</button>
+            <button id="closeButton">OK</button>
         </div>
     </div>
 {% endblock %}

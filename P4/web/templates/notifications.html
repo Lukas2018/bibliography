@@ -1,7 +1,11 @@
 {% block body %}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ csp_nonce() }}">
         let notification = document.getElementById("notification");
         notification.style.display = "none";
+        let button = document.getElementById("closeButton");
+        button.onclick = function() {
+            document.getElementById("notification").style.display = "none";
+        }
 		let username = '{{ username }}';
 		let source = new EventSource('http://localhost:5001/event/' + username, {"Access-Control-Allow-Origin": true});
 		source.onmessage = function (event) {
