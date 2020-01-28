@@ -9,43 +9,42 @@
 	<meta name="author" content="Łukasz Glapiak (291067)">
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-	<script src="js/register_scripts.js"></script>
 </head>
 
 <body>
 	<section id="register">
-		<form id="register_form" action="https://pi.iem.pw.edu.pl/register" method="post" onsubmit="isFormValid(this); return false;" enctype="multipart/form-data">
+		<form id="register_form" action="https://pi.iem.pw.edu.pl/register" method="post" enctype="multipart/form-data">
 			<h1>Zarejestruj się</h1>
 			<ul >
 				<li class="col-md-6 form-group">
 					<label for="firstname">Imię</label>
-					<input id="firstname" class="form-control" onchange="isFirstNameValid()" type="text" name="firstname" placeholder="Imię" pattern="[A-ZĄĘĆŃÓŻŹŁ]{1}[a-ząęćńóżźł]{2,}" required>
+					<input id="firstname" class="form-control" type="text" name="firstname" placeholder="Imię" pattern="[A-ZĄĘĆŃÓŻŹŁ]{1}[a-ząęćńóżźł]{2,}" required>
 				</li>
 				<li class="col-md-6 form-group">
 					<label for="lastname">Nazwisko</label>
-					<input id="lastname" class="form-control" onchange="isLastNameValid()" type="text" name="lastname" placeholder="Nazwisko" pattern="[A-ZĄĘĆŃÓŻŹŁ]{1}[a-ząęćńóżźł]{2,}" required>
+					<input id="lastname" class="form-control" type="text" name="lastname" placeholder="Nazwisko" pattern="[A-ZĄĘĆŃÓŻŹŁ]{1}[a-ząęćńóżźł]{2,}" required>
 				</li>
 				<li class="col-md-12 form-group">
 					<label for="login">Login</label>
-					<input id="login" class="form-control" onchange="isLoginValid()" type="text" name="login" placeholder="Login" pattern="[a-z]{3,12}" required> <!-- wersja pattern pod regex serwera -->
+					<input id="login" class="form-control" type="text" name="login" placeholder="Login" pattern="[a-z]{3,12}" required> <!-- wersja pattern pod regex serwera -->
 					<!--<input id="login" class="form-control" onchange="isLoginValid()" type="text" name="login" placeholder="Login" pattern="[A-Za-z0-9]{3,12}" required>-->
 				</li>
 				<li class="col-md-12 form-group">
 					<label for="password">Hasło</label>
-					<input id="password" class="form-control" onchange="isPasswordValid()" type="password" name="password" placeholder="Hasło" pattern="[A-Za-z]{8,}" required> <!-- wersja pattern pod regex serwera -->
+					<input id="password" class="form-control" type="password" name="password" placeholder="Hasło" pattern="[A-Za-z]{8,}" required> <!-- wersja pattern pod regex serwera -->
 					<!--<input id="password" class="form-control" onchange="isPasswordValid()" type="password" name="password" placeholder="Hasło" pattern="^.{8,}$" required>-->
 				</li>
 				<li class="col-md-12 form-group">
 					<label for="repeat_password">Powtórz hasło</label>
-					<input id="repeat_password" class="form-control" onfocusout="validatePasswordCompatibility()" type="password" name="repeat_password" placeholder="Powtórz hasło" required>
+					<input id="repeat_password" class="form-control" type="password" name="repeat_password" placeholder="Powtórz hasło" required>
 				</li>
 				<li class="col-md-12 form-group">
 					<label for="pesel">Pesel</label>
-					<input id="pesel" class="form-control" onchange="isPeselValid()" type="text" name="pesel" placeholder="Pesel" pattern="[0-9]{11}">
+					<input id="pesel" class="form-control" type="text" name="pesel" placeholder="Pesel" pattern="[0-9]{11}">
 				</li>
 				<li class="col-md-12 form-group">
 					<label for="birthdate">Data urodzenia</label>
-					<input id="birthdate" class="form-control" onfocusout="isBirthDateValid()" type="date" name="birthdate" min="1900-01-01">
+					<input id="birthdate" class="form-control" type="date" name="birthdate" min="1900-01-01">
 				</li>
 				<li class="col-md-4 form-group"><label><b>Płeć</b></label></li>
 				<li class="col-md-4 form-check form-group">
@@ -60,10 +59,11 @@
 					<input id="file" class="form-control-file form-group" type="file" name="photo" accept="image/*" size="10000000"/>
 				</li>
 				<li>
-					<button class="btn btn-primary btn-block active" type="sumbit">Prześlij formularz</button>
+					<button id="button" class="btn btn-primary btn-block active">Prześlij formularz</button>
 				</li>
 			</ul>
 		</form>
 	</section>
 </body>
+<script src="js/register_scripts.js"></script>
 </html>

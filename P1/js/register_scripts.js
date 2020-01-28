@@ -1,5 +1,30 @@
 var isLoginAvailable = false;
 
+window.onload = function initActions() {
+	var form = document.getElementById('register_form');
+	var firstname = document.getElementById('firstname');
+	var lastname = document.getElementById('lastname');
+	var login = document.getElementById('login');
+	var password = document.getElementById('password');
+	var repeatPassword = document.getElementById('repeat_password');
+	var pesel = document.getElementById('pesel');
+	var birthDate = document.getElementById('birthdate');
+	var button = document.getElementById('button');
+	form.onsubmit = validateForm;
+	firstname.addEventListener('change', isFirstNameValid);
+	lastname.addEventListener('change', isLastNameValid);
+	login.addEventListener('change', isLoginValid);
+	password.addEventListener('change', isPasswordValid);
+	repeatPassword.addEventListener('focusout', validatePasswordCompatibility);
+	pesel.addEventListener('change', isPeselValid);
+	birthDate.addEventListener('focusout', isBirthDateValid);
+}
+
+function validateForm() {
+	var form = document.getElementById('register_form');
+	isFormValid(form);
+	return false;
+}
 function isFirstNameValid() {
 	var nameNode = document.getElementById('firstname');
 	return isNameValid(nameNode);
@@ -15,8 +40,8 @@ function isNameValid(nameNode) {
 	checkpElementsAndRemoveIfExist(parent);
 	if(nameNode.value.length < 3) {
 		var p = document.createElement('p');
-		p.innerHTML = "Podana fraza jest za krótka, wymagane minimum 3 znaki";
-		p.className += "invalid_data";
+		p.innerHTML = 'Podana fraza jest za krótka, wymagane minimum 3 znaki';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
@@ -27,8 +52,8 @@ function isNameValid(nameNode) {
 	}
 	else {
 		var p = document.createElement('p');
-		p.innerHTML = "Wystąpiły niedozwolone znaki";
-		p.className += "invalid_data";
+		p.innerHTML = 'Wystąpiły niedozwolone znaki';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
@@ -44,27 +69,27 @@ async function isLoginValid() {
 	checkpElementsAndRemoveIfExist(parent);
 	var p = document.createElement('p');
 	if(login.value < 3) {		
-		p.innerHTML = "Login za krótki, wymagane minimum 3 znaki";
-		p.className += "invalid_data";
+		p.innerHTML = 'Login za krótki, wymagane minimum 3 znaki';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
 	else if(login.value > 12) {
-		p.innerHTML = "Login za długi, dopuszczalne maximum 12 znaków";
-		p.className += "invalid_data";
+		p.innerHTML = 'Login za długi, dopuszczalne maximum 12 znaków';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
 	var regex = new RegExp(/^[a-z]+$/); // wersja pod regex serwera
 	//var regex = new RegExp(/^[a-zA-Z0-9]+$/);
 	if(!regex.test(login.value)){
-		//p.innerHTML = "Wykryto niedozwolone znaki w loginie, dopuszczalne tylko litery i cyfry";
-		p.innerHTML = "Wykryto niedozwolone znaki w loginie, dopuszczalne tylko małe litery"; // wersja pod regex serwera
-		p.className += "invalid_data";
+		//p.innerHTML = 'Wykryto niedozwolone znaki w loginie, dopuszczalne tylko litery i cyfry';
+		p.innerHTML = 'Wykryto niedozwolone znaki w loginie, dopuszczalne tylko małe litery'; // wersja pod regex serwera
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
-	var url = "https://pi.iem.pw.edu.pl/user/" + login.value;
+	var url = 'https://pi.iem.pw.edu.pl/user/' + login.value;
 	request('GET', url)
 		.catch(e => {
 			console.log(e);
@@ -81,8 +106,8 @@ function request(method, url) {
 			if(this.status === 200) {
 				var loginParent = document.getElementById('login').parentElement;
 				var p = document.createElement('p');
-				p.innerHTML = "Wybrany login jest zajęty";
-				p.className += "invalid_data";
+				p.innerHTML = 'Wybrany login jest zajęty';
+				p.className += 'invalid_data';
 				loginParent.appendChild(p);
 				resolve(xhr.response);
 			} 
@@ -90,7 +115,7 @@ function request(method, url) {
 				isLoginAvailable = true;
 			}
 			else if(this.status === 500 || this.status === 502 || this.status === 503 || this.status === 505) {
-				window.alert("Występują błędy po stronie serwera, spróbuj ponownie później zarejestrować się w serwisie");
+				window.alert('Występują błędy po stronie serwera, spróbuj ponownie później zarejestrować się w serwisie');
 				isLoginAvailable = false;
 			}
 			else {
@@ -115,16 +140,16 @@ function isPasswordValid() {
 	checkpElementsAndRemoveIfExist(parent);
 	validatePasswordCompatibility();
 	if(pass.value.length < 8) {
-		p.innerHTML = "Hasło zbyt krótkie, wymagane minimum 8 znaków";
-		p.className += "invalid_data";
+		p.innerHTML = 'Hasło zbyt krótkie, wymagane minimum 8 znaków';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
 	else {
 		var score = scorePassword(pass.value);
 		if(score < 60) {
-			p.innerHTML = "Podane hasło jest zbyt słabe";
-			p.className += "invalid_data";
+			p.innerHTML = 'Podane hasło jest zbyt słabe';
+			p.className += 'invalid_data';
 			parent.appendChild(p);
 			return false;
 		}
@@ -165,8 +190,8 @@ function validatePasswordCompatibility() {
 	}
 	else {
 		var p = document.createElement('p');
-		p.innerHTML = "Hasła nie są zgodne";
-		p.className += "invalid_data";
+		p.innerHTML = 'Hasła nie są zgodne';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
@@ -183,8 +208,8 @@ function isPeselValid() {
 	}
 	else {
 		var p = document.createElement('p');
-		p.innerHTML = "Nieprawidłowy numer pesel";
-		p.className += "invalid_data";
+		p.innerHTML = 'Nieprawidłowy numer pesel';
+		p.className += 'invalid_data';
 		parent.appendChild(p);	
 		return false;
 	}
@@ -256,18 +281,18 @@ function isBirthDateValid() {
 	var dd = today.getDate();
 	var mm = today.getMonth()+1;
 	var yyyy = today.getFullYear();
-	today = yyyy + "-" + mm + "-" + dd;
-	var minDate = "1900-01-01";
+	today = yyyy + '-' + mm + '-' + dd;
+	var minDate = '1900-01-01';
 	checkpElementsAndRemoveIfExist(parent);
 	if(birthDate > today) {
-		p.innerHTML = "Data urodzenia nie może być większa niż dzisiejsza data";
-		p.className += "invalid_data";
+		p.innerHTML = 'Data urodzenia nie może być większa niż dzisiejsza data';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
 	else if(birthDate < minDate) {
-		p.innerHTML = "Data urodzenia musi być większa niż 1900-01-01";
-		p.className += "invalid_data";
+		p.innerHTML = 'Data urodzenia musi być większa niż 1900-01-01';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
@@ -280,8 +305,8 @@ function isFileValid() {
 	checkpElementsAndRemoveIfExist(parent);
 	if(file.files.length == 0 ){
 		var p = document.createElement('p');
-		p.innerHTML = "Nie wybrano pliku";
-		p.className += "invalid_data";
+		p.innerHTML = 'Nie wybrano pliku';
+		p.className += 'invalid_data';
 		parent.appendChild(p);
 		return false;
 	}
@@ -291,8 +316,8 @@ function isFileValid() {
 		}
 		else {
 			var p = document.createElement('p');
-			p.innerHTML = "Wybrany plik nie jest plikiem graficznym";
-			p.className += "invalid_data_file";
+			p.innerHTML = 'Wybrany plik nie jest plikiem graficznym';
+			p.className += 'invalid_data_file';
 			parent.appendChild(p);
 			return false;
 		}
@@ -306,8 +331,8 @@ function checkpElementsAndRemoveIfExist(parent) {
 	}
 }
 
-async function isFormValid(form) {
-	if((isFirstNameValid() && isLastNameValid() && await isLoginValid() && isPasswordValid() && validatePasswordCompatibility() && isPeselValid() && isBirthDateValid() && isFileValid()) == 1) {
+function isFormValid(form) {
+	if((isFirstNameValid() && isLastNameValid() && isLoginAvailable && isPasswordValid() && validatePasswordCompatibility() && isPeselValid() && isBirthDateValid() && isFileValid()) == 1) {
 		form.submit();
 	}
 }
